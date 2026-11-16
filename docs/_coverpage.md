@@ -10,4 +10,4 @@
 - Zero-hassle client RazorLight integration
 
 [Get Started](getting-started.md)
-[GitHub Repository](#)
+[GitHub Repository](https://github.com/Alimul-Mahfuz/AmtStudio.CustomMailingKit)

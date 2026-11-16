@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="AmtStudio.CustomMailingKit.Sample/AmtStudio.CustomMailingKit.Sample.csproj" />
+  <Project Path="AmtStudio.CustomMailingKit.Tests/AmtStudio.CustomMailingKit.Tests.csproj" />
+  <Project Path="AmtStudio.CustomMailingKit/AmtStudio.CustomMailingKit.csproj" />
+</Solution>

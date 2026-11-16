@@ -1,5 +1,11 @@
 <Solution>
-  <Project Path="AmtStudio.CustomMailingKit.Sample/AmtStudio.CustomMailingKit.Sample.csproj" />
-  <Project Path="AmtStudio.CustomMailingKit.Tests/AmtStudio.CustomMailingKit.Tests.csproj" />
-  <Project Path="AmtStudio.CustomMailingKit/AmtStudio.CustomMailingKit.csproj" />
+  <Folder Name="/samples/">
+    <Project Path="samples/AmtStudio.CustomMailingKit.Sample/AmtStudio.CustomMailingKit.Sample.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/AmtStudio.CustomMailingKit/AmtStudio.CustomMailingKit.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AmtStudio.CustomMailingKit.Tests/AmtStudio.CustomMailingKit.Tests.csproj" />
+  </Folder>
 </Solution>

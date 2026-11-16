@@ -25,7 +25,7 @@ jobs:
       run: dotnet build AmtStudio.CustomMailingKit.slnx --no-restore --configuration Release
 
     - name: Test
-      run: dotnet test AmtStudio.CustomMailingKit.Tests\AmtStudio.CustomMailingKit.Tests.csproj --no-build --verbosity normal --configuration Release
+      run: dotnet test tests\AmtStudio.CustomMailingKit.Tests\AmtStudio.CustomMailingKit.Tests.csproj --no-build --verbosity normal --configuration Release
 
     - name: Pack NuGet Package
-      run: dotnet pack AmtStudio.CustomMailingKit\AmtStudio.CustomMailingKit.csproj -c Release -o ./artifacts
+      run: dotnet pack src\AmtStudio.CustomMailingKit\AmtStudio.CustomMailingKit.csproj -c Release -o ./artifacts

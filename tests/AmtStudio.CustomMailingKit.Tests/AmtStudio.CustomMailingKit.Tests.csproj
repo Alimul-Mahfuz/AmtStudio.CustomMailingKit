@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AmtStudio.CustomMailingKit\AmtStudio.CustomMailingKit.csproj" />
+    <ProjectReference Include="..\..\src\AmtStudio.CustomMailingKit\AmtStudio.CustomMailingKit.csproj" />
   </ItemGroup>
 
 </Project>

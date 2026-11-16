@@ -1,54 +1,95 @@
-# Introduction
+# Overview & Architecture
 
-**AmtStudio.CustomMailingKit** is a production-grade, highly testable, and reusable email library built on top of **MailKit 5** and **MimeKit 5** for modern .NET applications (.NET 10+).
-
-## Why AmtStudio.CustomMailingKit?
-
-While MailKit is the premier email protocol library for .NET, building enterprise email workflows often requires boilerplate code:
-- Wiring up connection options with `IConfiguration` and `Microsoft.Extensions.Options`.
-- Implementing exponential backoff retry policies for flaky network blips.
-- Converting complex attachment logic (streams, raw bytes, inline CID resources).
-- Setting up clean test mocks without dealing with low-level socket clients.
-
-`AmtStudio.CustomMailingKit` solves all of these by providing a clean, fluent abstraction layer while maintaining full fidelity with MailKit.
+**AmtStudio.CustomMailingKit** is a production-grade, highly testable email delivery framework for **.NET 10+** applications. It builds directly upon the official **MailKit 5** and **MimeKit 5** libraries, delivering an enterprise-ready developer experience out of the box.
 
 ---
 
-## Architecture at a Glance
+## ⚖️ Why Use AmtStudio.CustomMailingKit?
+
+| Capability | Legacy `System.Net.Mail` | Raw `MailKit` | **AmtStudio.CustomMailingKit** |
+| :--- | :---: | :---: | :---: |
+| **Status** | ⚠️ *Deprecated by Microsoft* | Active OSS | ✅ Active & Maintained |
+| **Modern Auth (TLS 1.3 / STARTTLS)** | ❌ Limited | ✅ Yes | ✅ Yes |
+| **Native ASP.NET Core DI Registration** | ❌ No | ❌ Manual boilerplate | ✅ Built-in (`AddCustomMailingKit`) |
+| **Transient Retry Policy** | ❌ No | ❌ Manual loop required | ✅ Built-in Exponential Backoff |
+| **Fluent Message Builder** | ❌ No | ❌ Manual MimeMessage setup | ✅ Complete Fluent API |
+| **Inline Images & Embedded CID** | ⚠️ Complex | ⚠️ Verbose | ✅ 1-Line (`AttachInline`) |
+| **Client Template Compatibility** | ❌ None | ❌ None | ✅ RazorLight & Token Engine |
+| **Mockable for Unit Testing** | ❌ Impossible | ⚠️ Hard (Needs sockets) | ✅ Full Interface Abstractions |
+
+---
+
+## 📐 Architecture Flow
+
+The library cleanly separates domain models, builder contracts, MimeKit message translation, and transport socket lifecycles:
 
 ```mermaid
-flowchart LR
-    A["Client Application"] -->|"Injects"| B["IEmailService"]
-    B -->|"Builds via"| C["EmailMessageBuilder"]
-    B -->|"Converts via"| D["IMimeMessageConverter"]
-    D -->|"Produces"| E["MimeKit MimeMessage"]
-    B -->|"Connects via"| F["ISmtpClientFactory"]
-    F -->|"Sends via"| G["MailKit SmtpClient"]
-    G -->|"SMTP / TLS"| H["Mail Server (SendGrid / Gmail / SES)"]
+flowchart TD
+    subgraph Client["Your Application Layer"]
+        Ctrl["API Controller / Minimal API / Background Worker"]
+    end
+
+    subgraph MailingKit["AmtStudio.CustomMailingKit"]
+        Builder["EmailMessageBuilder\n(Fluent API)"]
+        Msg["EmailMessage Model\n(To, Cc, Body, Attachments)"]
+        Service["MailKitEmailService\n(Retry Loop & Logging)"]
+        Converter["IMimeMessageConverter"]
+        ClientFactory["ISmtpClientFactory"]
+    end
+
+    subgraph MailKitLayer["MailKit 5.0 Core"]
+        Mime["MimeKit MimeMessage"]
+        Request["MailKit SendRequest"]
+        Transport["MailKit SmtpClient"]
+    end
+
+    subgraph External["External Network"]
+        SMTP["SMTP Mail Server\n(SendGrid / Gmail / SES / M365)"]
+    end
+
+    Ctrl -->|"1. Configures"| Builder
+    Builder -->|"2. Yields"| Msg
+    Ctrl -->|"3. Injects & calls"| Service
+    Service -->|"4. Translates"| Converter
+    Converter -->|"5. Produces"| Mime
+    Mime -->|"6. Wraps in"| Request
+    Service -->|"7. Acquires connected client"| ClientFactory
+    ClientFactory -->|"8. Creates & authenticates"| Transport
+    Service -->|"9. Executes resilient send"| Transport
+    Transport -->|"10. TLS / TCP"| SMTP
 ```
 
 ---
 
-## Feature Matrix
+## ⚡ 10-Second Teaser
 
-| Feature | Support |
-| :--- | :---: |
-| .NET 10 & C# 13+ | ✅ |
-| `Microsoft.Extensions.DependencyInjection` | ✅ |
-| `IConfiguration` / `appsettings.json` binding | ✅ |
-| Fluent Builder API (`EmailMessageBuilder`) | ✅ |
-| HTML & Plain text dual bodies | ✅ |
-| File, byte[], and stream attachments | ✅ |
-| Inline Linked Resources (`<img src="cid:logo">`) | ✅ |
-| Custom Headers & Priority flags | ✅ |
-| Resilient transient retries (exponential backoff) | ✅ |
-| Built-in token engine (`{{ Property }}`) | ✅ |
-| Client-side RazorLight rendering compatibility | ✅ |
-| Fully Unit Tested (20/20 Passing) | ✅ |
+```csharp
+// 1. Inject IEmailService into your class
+public class OrderService(IEmailService emailService)
+{
+    public async Task CompleteOrderAsync(string customerEmail, byte[] pdfInvoice)
+    {
+        // 2. Build and deliver with fluent chaining & retries
+        var result = await emailService.SendAsync(builder => builder
+            .To(customerEmail)
+            .Subject("Your Order Confirmation")
+            .HtmlBody("<h1>Thank You!</h1><p>Your invoice is attached.</p>")
+            .AttachBytes(pdfInvoice, "Invoice.pdf", "application/pdf")
+            .Priority(EmailPriority.High));
+
+        if (!result.IsSuccess)
+        {
+            // Log failure details without unhandled socket crashes
+            Console.WriteLine($"Failed to send: {result.ErrorMessage}");
+        }
+    }
+}
+```
 
 ---
 
-## Next Steps
+## 🧭 Navigation
 
-- Head over to [Getting Started](getting-started.md) to install and configure the package.
-- Check [RazorLight Template Guide](razorlight-guide.md) to send dynamic HTML emails.
+- Jump straight into [Quick Start](getting-started.md) to set up your project in 2 minutes.
+- Check out the [Configuration Guide](configuration.md) to bind `appsettings.json`.
+- Learn how to send rich Razor templates in the [RazorLight Guide](razorlight-guide.md).

@@ -1,47 +1,78 @@
-# Email Message Builder API
+# Fluent Message Builder API
 
-The `EmailMessageBuilder` provides a fluent interface to construct complex emails with minimal code.
+The `EmailMessageBuilder` provides an expressive, chaining API for constructing complete `EmailMessage` models.
 
-## Builder Methods Reference
+---
 
-### Recipients & Sender
+## 📋 Method Reference
+
+### Senders & Recipients
+
+| Method | Parameters | Description |
+| :--- | :--- | :--- |
+| `.From(address, [name])` | `string address, string? displayName` | Sets the sender. If omitted, falls back to `DefaultFromAddress` in options. |
+| `.To(address, [name])` | `string address, string? displayName` | Adds a primary recipient. |
+| `.To(addresses)` | `IEnumerable<string> addresses` | Adds multiple primary recipients in bulk. |
+| `.Cc(address, [name])` | `string address, string? displayName` | Adds a carbon-copy (CC) recipient. |
+| `.Cc(addresses)` | `IEnumerable<string> addresses` | Adds multiple CC recipients. |
+| `.Bcc(address, [name])` | `string address, string? displayName` | Adds a blind-carbon-copy (BCC) recipient. |
+| `.Bcc(addresses)` | `IEnumerable<string> addresses` | Adds multiple BCC recipients. |
+| `.ReplyTo(address, [name])` | `string address, string? displayName` | Sets the reply-to destination for replies. |
+
+---
+
+### Subject & Body
+
+| Method | Parameters | Description |
+| :--- | :--- | :--- |
+| `.Subject(subject)` | `string subject` | Sets the email subject line. |
+| `.HtmlBody(html)` | `string htmlBody` | Sets the rich HTML version of the email. |
+| `.PlainTextBody(text)`| `string plainText` | Sets the fallback plain text version for clients without HTML rendering. |
+| `.Body(content, isHtml)`| `string content, bool isHtml` | Sets the body content with an explicit format boolean flag. |
+
+---
+
+### Priority & Custom Headers
+
+| Method | Parameters | Description |
+| :--- | :--- | :--- |
+| `.Priority(priority)` | `EmailPriority (Low, Normal, High)` | Sets the message urgency and importance headers. |
+| `.Header(name, value)`| `string name, string value` | Adds a custom MIME header (e.g., `X-Tenant-Id`, `X-Campaign-Id`). |
+
+---
+
+### Attachments
+
+| Method | Parameters | Description |
+| :--- | :--- | :--- |
+| `.AttachFile(path, [type], [name])` | `string path, string? contentType, string? fileName` | Attaches a physical file from the disk. |
+| `.AttachBytes(bytes, name, [type])` | `byte[] content, string fileName, string? contentType` | Attaches in-memory raw byte content. |
+| `.AttachStream(stream, name, [type])` | `Stream stream, string fileName, string? contentType` | Attaches a readable stream (e.g. from AWS S3 or Blob storage). |
+| `.AttachInline(contentId, bytes, name, [type])` | `string contentId, byte[] content, string fileName, string? contentType` | Embeds an inline linked resource referenced in HTML via `cid:contentId`. |
+| `.AttachInlineFile(contentId, path, [type])` | `string contentId, string filePath, string? contentType` | Embeds a local file as an inline linked resource. |
+
+---
+
+## 💡 Real-World Examples
+
+### 1. Simple Notification Email
 ```csharp
-builder
-    .From("sender@domain.com", "Display Name")
-    .To("user1@domain.com", "User 1")
-    .To(new[] { "user2@domain.com", "user3@domain.com" })
-    .Cc("manager@domain.com")
-    .Bcc("compliance@domain.com")
-    .ReplyTo("support@domain.com");
+var result = await emailService.SendAsync(b => b
+    .To("member@domain.com")
+    .Subject("Your Weekly Digest")
+    .HtmlBody("<p>Here is what happened this week...</p>")
+    .PlainTextBody("Here is what happened this week..."));
 ```
 
-### Subject & Content
+### 2. Multi-Recipient Urgent Alert with Custom Headers
 ```csharp
-builder
-    .Subject("Account Security Alert")
-    .HtmlBody("<h2>Security Notice</h2><p>A new login was detected.</p>")
-    .PlainTextBody("Security Notice: A new login was detected.");
-```
-
-### Priority
-```csharp
-builder.Priority(EmailPriority.High); // Options: Low, Normal, High
-```
-
-### Custom Headers
-```csharp
-builder
-    .Header("X-Tenant-Id", "tenant-8832")
-    .Header("X-Campaign-Id", "black-friday-2026");
-```
-
-### Complete Example
-```csharp
-var result = await emailService.SendAsync(builder => builder
-    .From("security@amtstudio.com", "AmtStudio Security")
-    .To("admin@example.com")
-    .Subject("URGENT: Password Reset Requested")
-    .HtmlBody("<p>Click <a href='https://amtstudio.com/reset'>here</a> to reset your password.</p>")
+var result = await emailService.SendAsync(b => b
+    .From("alerts@amtstudio.com", "System Monitor")
+    .To(new[] { "devops1@amtstudio.com", "devops2@amtstudio.com" })
+    .Cc("team-lead@amtstudio.com")
+    .Subject("[P0] Production Server High Latency Alert")
+    .HtmlBody("<h2>High Latency Warning</h2><p>Database response time exceeded 2500ms.</p>")
     .Priority(EmailPriority.High)
-    .Header("X-Priority", "1"));
+    .Header("X-Incident-Id", "INC-99042")
+    .Header("X-Auto-Generated", "true"));
 ```

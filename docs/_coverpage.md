@@ -1,13 +1,22 @@
 <!-- _coverpage.md -->
 
-# AmtStudio.CustomMailingKit <small>1.0.0</small>
+# AmtStudio.CustomMailingKit <small>v1.0.0</small>
 
-> A modern, resilient, and enterprise-ready email delivery library for .NET 10+ powered by MailKit and MimeKit.
+> A robust, modern, and reusable email delivery library for .NET 10+ powered by **MailKit** and **MimeKit**.
 
-- Native `Microsoft.Extensions.DependencyInjection` & Options pattern
-- Resilient retries with exponential backoff
-- Fluent builder, rich attachments, and inline CID images
-- Zero-hassle client RazorLight integration
+<p align="center">
+  <span class="badge badge-blue">.NET 10.0</span>
+  <span class="badge badge-blue">MailKit 5.0</span>
+  <span class="badge badge-green">20/20 Tests Passing</span>
+  <span class="badge badge-purple">MIT License</span>
+  <span class="badge badge-orange">NuGet Package</span>
+</p>
 
-[Get Started](getting-started.md)
+- 🚀 **Dependency Injection First**: Native `.AddCustomMailingKit()` with `IConfiguration` or code options.
+- 🛡️ **Resilient Retries**: Automatic exponential backoff for transient network and socket hiccups.
+- 🎨 **Fluent Builder**: Chain `.To()`, `.Subject()`, `.HtmlBody()`, `.AttachFile()`, and `.Priority()`.
+- 📎 **Rich Attachments**: Memory streams, byte arrays, disk files, and inline CID (`<img src="cid:logo">`).
+- ⚡ **RazorLight Friendly**: Zero friction rendering of dynamic `.cshtml` email views.
+
+[Quick Start](getting-started.md)
 [GitHub Repository](https://github.com/Alimul-Mahfuz/AmtStudio.CustomMailingKit)

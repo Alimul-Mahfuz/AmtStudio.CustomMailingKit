@@ -1,15 +1,17 @@
 <!-- _sidebar.md -->
 
-* **Overview**
-  * [Introduction](README.md)
-  * [Getting Started](getting-started.md)
-
-* **Features & Guides**
+* **🚀 Getting Started**
+  * [Overview & Architecture](README.md)
+  * [Quick Start](getting-started.md)
   * [Configuration & Options](configuration.md)
-  * [Email Message Builder](builder-api.md)
+
+* **💡 Core Guides**
+  * [Fluent Message Builder](builder-api.md)
   * [Attachments & Inline Images](attachments.md)
   * [RazorLight Template Guide](razorlight-guide.md)
   * [SMTP Providers Setup](providers.md)
 
-* **Reference**
+* **🛠️ Advanced & Diagnostics**
+  * [Troubleshooting & FAQ](troubleshooting.md)
+  * [API Reference](api-reference.md)
   * [License & Contributing](license.md)
